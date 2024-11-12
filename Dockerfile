@@ -13,7 +13,13 @@ RUN apt-get update \
     && apt-get install gcc -y \
     && apt-get clean
 RUN pip install --upgrade pip
-RUN pip install Flask gunicorn google_pso_data_validator
+RUN pip install --upgrade google-auth
+RUN pip install oauth2client
+RUN pip install Flask gunicorn
+RUN pip install --upgrade google-pso-data-validator
+
+# Teradata Dependencies
+RUN pip install teradatasql
 
 # Hive/Impala Dependencies 
 # RUN pip install hdfs
