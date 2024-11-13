@@ -14,13 +14,24 @@ import datetime
 
 app = Flask(__name__)
 
+AUTH_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
+CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
+
+@app.route('/', methods=['POST'])
+
 def create_connections():
+    print('creating DVT connections')
     return_code = subprocess.call(['bash',"./connections.sh", "dataform-test-362521"])
     return return_code
 
 def execute_dvt():
+    print('Executing DVT')
+
+    print('reading CSV from GCS file')
     df = pd.read_csv('gs://dvt_configs/dvt_executions.csv')
     for index, row in df.iterrows():
+        print('current table: ' + row['target_table'])
+        
         if row['validation_type'] == 'column':
             print('calling shell script for column validation')
 
@@ -96,6 +107,5 @@ def execute_dvt():
                     print ('return_code',return_code)
 
 if __name__ == "__main__":
-
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
     
