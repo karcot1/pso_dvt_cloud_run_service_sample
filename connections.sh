@@ -1,9 +1,4 @@
 #!/bin/bash
-echo "test DVT is installed correctly"
-
-command="data-validation connections list"
-echo $command
-eval $command
 
 echo "creating DVT connections"
 
@@ -16,7 +11,7 @@ set -e
 # terapw=${echo $TERRA_PASSWORD}
 
 echo "BigQuery connection"
-bqcommand="data-validation connections add --connection-name bq_conn BigQuery --project_id $1"
+bqcommand="data-validation connections add --connection-name bq_conn BigQuery --project-id $1"
 echo $bqcommand
 eval $bqcommand
 
