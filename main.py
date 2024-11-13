@@ -12,12 +12,14 @@ import gcsfs
 import pandas as pd
 import datetime
 
+app = Flask(__name__)
+
 def create_connections():
     return_code = subprocess.call(['bash',"./connections.sh", "dataform-test-362521"])
     return return_code
 
-if __name__ == "__main__":    
-    df = pd.read_csv('dvt_executions.csv')
+def execute_dvt():
+    df = pd.read_csv('gs://dvt_configs/dvt_executions.csv')
     for index, row in df.iterrows():
         if row['validation_type'] == 'column':
             print('calling shell script for column validation')
@@ -92,4 +94,8 @@ if __name__ == "__main__":
                 else:
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"N",row['source_sql_location'],row['target_sql_location'],row['output_table'],str(int(row['num_partitions'])),ppf,gcs_location])
                     print ('return_code',return_code)
+
+if __name__ == "__main__":
+
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
     
