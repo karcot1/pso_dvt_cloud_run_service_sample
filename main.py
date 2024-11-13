@@ -12,11 +12,14 @@ import gcsfs
 import pandas as pd
 import datetime
 
+def create_connections():
+    return_code = subprocess.call(['bash',"./connections.sh", "dataform-test-362521"])
+    return return_code
+
 if __name__ == "__main__":    
     df = pd.read_csv('dvt_executions.csv')
     for index, row in df.iterrows():
         if row['validation_type'] == 'column':
-            # print(row)
             print('calling shell script for column validation')
 
             if pd.isna(row['count_columns']):
@@ -34,14 +37,17 @@ if __name__ == "__main__":
 
             if row['partition'] == "N":
                 print('calling shell script for row validation')
+
                 if row['exclude_columns'] == 'Y':
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "row", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"Y",row['exclude_column_list'],row['output_table']])
                     print ('return_code',return_code)
                 else:
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "row", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"N",row['output_table']])
                     print ('return_code',return_code)
+
             else:
                 print('generating partition yamls')
+
                 table_name = row['target_table'].split('.')[2]
                 datetime_var = '{date:%Y-%m-%d_%H:%M:%S}'.format(date=datetime.datetime.now())
                 gcs_location = 'gs://dvt_yamls/' + table_name + '/' + datetime_var
