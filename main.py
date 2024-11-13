@@ -20,7 +20,7 @@ CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
 @app.route('/', methods=['POST'])
 
 def create_connections():
-    print('creating DVT connections')
+    print('calling bash script to create connections')
     return_code = subprocess.call(['bash',"./connections.sh", "dataform-test-362521"])
     return return_code
 
@@ -31,7 +31,7 @@ def execute_dvt():
     df = pd.read_csv('gs://dvt_configs/dvt_executions.csv')
     for index, row in df.iterrows():
         print('current table: ' + row['target_table'])
-        
+
         if row['validation_type'] == 'column':
             print('calling shell script for column validation')
 
