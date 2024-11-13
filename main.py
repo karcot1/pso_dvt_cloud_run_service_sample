@@ -23,6 +23,7 @@ def create_connections():
     print('calling bash script to create connections')
     return_code = subprocess.call(['bash',"./connections.sh", "dataform-test-362521"])
     print ('return_code',return_code)
+    return "create_connectons completed successfully"
 
 def execute_dvt():
     print('Executing DVT')
@@ -105,6 +106,7 @@ def execute_dvt():
                 else:
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"N",row['source_sql_location'],row['target_sql_location'],row['output_table'],str(int(row['num_partitions'])),ppf,gcs_location])
                     print ('return_code',return_code)
+    return "DVT executions completed"
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
