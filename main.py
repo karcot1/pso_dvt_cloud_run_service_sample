@@ -22,7 +22,7 @@ CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
 def create_connections():
     print('calling bash script to create connections')
     return_code = subprocess.call(['bash',"./connections.sh", "dataform-test-362521"])
-    return return_code
+    print ('return_code',return_code)
 
 def execute_dvt():
     print('Executing DVT')
