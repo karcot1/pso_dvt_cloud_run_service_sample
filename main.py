@@ -19,6 +19,20 @@ CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
 
 @app.route('/', methods=['POST'])
 
+def index():
+    try:
+        create_connections()
+    except Exception as e:
+        print("Error executing DVT: ", e)
+
+    try:
+        execute_dvt()
+    except Exception as e:
+        print("Error executing DVT: ", e)
+    
+    return "Execution complete"
+
+
 def create_connections():
     print('calling bash script to create connections')
     return_code = subprocess.call(['bash',"./connections.sh", "dataform-test-362521"])
