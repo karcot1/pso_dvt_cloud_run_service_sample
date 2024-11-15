@@ -14,12 +14,20 @@ import datetime
 
 app = Flask(__name__)
 
+project_id = os.environ.get("PROJECT_ID")
+
 AUTH_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
 CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
 
 @app.route('/', methods=['POST'])
 
 def index():
+
+    # try:
+    #     get_credentials(project_id)
+    # except Exception as e:
+    #     print("Error getting TD credentials: ", e)
+
     try:
         create_connections()
     except Exception as e:
@@ -38,6 +46,17 @@ def create_connections():
     return_code = subprocess.call(['bash',"./connections.sh", "dataform-test-362521"])
     print ('return_code',return_code)
     return "create_connectons completed successfully"
+
+# required for Teradata connections: pulls connection information from secret manager and saves as environment variables
+
+# def get_credentials(BQprojectId):
+#     client = secretmanager.SecretManagerServiceClient()
+#     teradata_secret = f"projects/{BQprojectId}/secrets/tera-credentials/versions/latest"    
+#     response = client.access_secret_version(name=teradata_secret)
+#     payload= response.payload.data.decode("UTF-8")
+#     tera_json=json.loads(payload)
+#     for key,value in tera_json.items():
+#         os.environ[key] = value
 
 def execute_dvt():
     print('Executing DVT')
