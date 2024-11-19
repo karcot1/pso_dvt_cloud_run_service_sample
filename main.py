@@ -188,7 +188,7 @@ def execute_dvt():
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "partition", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"Y",row['exclude_column_list'],row['output_table'],partition_output['num_partitions'],partition_output['parts_per_file'],gcs_location])
                     print ('return_code',return_code)
                 else:
-                    return_code = subprocess.call(['bash',"./run_dvt.sh", "partition", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"N",row['output_table'],str(int(row['num_partitions'])),ppf,gcs_location])
+                    return_code = subprocess.call(['bash',"./run_dvt.sh", "partition", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"N",row['output_table'],partition_output['num_partitions'],partition_output['parts_per_file'],gcs_location])
                     print ('return_code',return_code)
 
         if row['validation_type'] == 'custom_query':
