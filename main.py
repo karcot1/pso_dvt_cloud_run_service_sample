@@ -15,24 +15,23 @@ import datetime
 
 app = Flask(__name__)
 
-project_id = os.environ.get("PROJECT_ID")
-print('project_id: ', project_id)
-
 AUTH_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
 CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
-PROJECT_ID = os.environ.get("PROJECT_ID")
 
 @app.route('/', methods=['POST'])
 
 def index():
+    project_id = os.environ.get("PROJECT_ID")
+    print('project_id: ', project_id)
 
     # try:
     #     get_credentials(project_id)
     # except Exception as e:
     #     print("Error getting TD credentials: ", e)
 
+
     try:
-        create_connections(PROJECT_ID)
+        create_connections(project_id)
     except Exception as e:
         print("Error executing DVT: ", e)
 
@@ -48,9 +47,9 @@ def create_connections(project_id):
     print('calling bash script to create connections')
     try:
         return_code = subprocess.call(['bash',"./connections.sh", project_id])
+        print ('return_code',return_code)
     except Exception as e:
         print('Error creating connections: ', e)
-    print ('return_code',return_code)
     return "create_connectons completed successfully"
 
 # required for Teradata connections: pulls connection information from secret manager and saves as environment variables
@@ -184,7 +183,6 @@ def execute_dvt():
                     print ('return_code',return_code)
 
             else:
-                print('current table: ' + row['target_table'])
                 print('generating partition yamls')
 
                 table_name = row['target_table'].split('.')[2]
@@ -215,10 +213,10 @@ def execute_dvt():
                 datetime_var = '{date:%Y-%m-%d_%H:%M:%S}'.format(date=datetime.datetime.now())
                 gcs_location = 'gs://dvt_yamls/' + table_name + '/' + datetime_var
 
-                if pd.isna(row['ppf']):
+                if int(row['num_partitions']) <= 10000:
                     ppf = '1'
                 else:
-                    ppf = str(int(row['ppf']))
+                    ppf = math.ceil(int(row['num_partitions']) / 10000)
 
                 if row['exclude_columns'] == 'Y':
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"Y",row['exclude_column_list'],row['source_sql_location'],row['target_sql_location'],row['output_table'],str(int(row['num_partitions'])),ppf,gcs_location])
