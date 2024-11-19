@@ -4,14 +4,14 @@ echo "creating DVT connections"
 
 set -e
 
-# project_id = ${echo $PROJECT_ID}
+project_id = ${echo $PROJECT_ID}
 # terahost=${echo $TERA_HOST}
 # teraport=${echo $TERA_PORT}
 # terauser=${echo $TERA_USER}
 # terapw=${echo $TERRA_PASSWORD}
 
 echo "BigQuery connection"
-bqcommand="data-validation connections add --connection-name bq_conn BigQuery --project-id $1"
+bqcommand="data-validation connections add --connection-name bq_conn BigQuery --project-id $project_id"
 echo $bqcommand
 eval $bqcommand
 

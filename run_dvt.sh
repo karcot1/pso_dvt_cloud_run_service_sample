@@ -40,7 +40,7 @@ elif [ $1 = "row" ]; then
         command="data-validation validate row --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --primary-keys $6 --hash '*' --bq-result-handler $8 --trim-string-pks"
     fi
     echo $command
-    eval $command
+    # eval $command
 
 elif [ $1 = "partition" ]; then
     echo "generating partitioned yamls"
@@ -50,7 +50,7 @@ elif [ $1 = "partition" ]; then
         command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --primary-keys $6 --hash '*' --bq-result-handler $8 --trim-string-pks --partition-num $9 --ppf ${10} --config-dir ${11}"
     fi
     echo $command
-    eval $command
+    # eval $command
 
 elif [ $1 = "custom_no_partition" ]; then
     echo "executing custom query validation"
@@ -60,7 +60,7 @@ elif [ $1 = "custom_no_partition" ]; then
         command="data-validation validate custom-query row --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash '*' --source-query-file $6 --target-query-file $7 --bq-result-handler $8 --trim-string-pks"
     fi
     echo $command
-    eval $command
+    # eval $command
 
 elif [ $1 = "custom_partition" ]; then
     echo "generating partition yamls for custom query validation"
@@ -70,7 +70,7 @@ elif [ $1 = "custom_partition" ]; then
         command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash '*' --source-query-file $6 --target-query-file $7 --bq-result-handler $8 --trim-string-pks --partition-num $9 --ppf ${10} --config-dir ${11}"
     fi
     echo $command
-    eval $command    
+    # eval $command    
 
 fi
 
