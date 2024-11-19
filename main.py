@@ -19,6 +19,7 @@ project_id = os.environ.get("PROJECT_ID")
 
 AUTH_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
 CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
+PROJECT_ID = os.environ.get("PROJECT_ID")
 
 @app.route('/', methods=['POST'])
 
@@ -30,7 +31,7 @@ def index():
     #     print("Error getting TD credentials: ", e)
 
     try:
-        create_connections()
+        create_connections(PROJECT_ID)
     except Exception as e:
         print("Error executing DVT: ", e)
 
@@ -42,9 +43,9 @@ def index():
     return "Execution complete"
 
 
-def create_connections():
+def create_connections(project_id):
     print('calling bash script to create connections')
-    return_code = subprocess.call(['bash',"./connections.sh", "dataform-test-362521"])
+    return_code = subprocess.call(['bash',"./connections.sh", project_id])
     print ('return_code',return_code)
     return "create_connectons completed successfully"
 
@@ -185,10 +186,10 @@ def execute_dvt():
                 gcs_location = 'gs://dvt_yamls/' + table_name + '/' + datetime_var
 
                 if row['exclude_columns'] == 'Y':
-                    return_code = subprocess.call(['bash',"./run_dvt.sh", "partition", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"Y",row['exclude_column_list'],row['output_table'],partition_output['num_partitions'],partition_output['parts_per_file'],gcs_location])
+                    return_code = subprocess.call(['bash',"./run_dvt.sh", "partition", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"Y",row['exclude_column_list'],row['output_table'],str(partition_output['num_partitions']),str(partition_output['parts_per_file']),gcs_location])
                     print ('return_code',return_code)
                 else:
-                    return_code = subprocess.call(['bash',"./run_dvt.sh", "partition", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"N",row['output_table'],partition_output['num_partitions'],partition_output['parts_per_file'],gcs_location])
+                    return_code = subprocess.call(['bash',"./run_dvt.sh", "partition", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"N",row['output_table'],str(partition_output['num_partitions']),str(partition_output['parts_per_file']),gcs_location])
                     print ('return_code',return_code)
 
         if row['validation_type'] == 'custom_query':
