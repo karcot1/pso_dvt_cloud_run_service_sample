@@ -16,6 +16,7 @@ import datetime
 app = Flask(__name__)
 
 project_id = os.environ.get("PROJECT_ID")
+print('project_id: ', project_id)
 
 AUTH_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
 CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
@@ -45,7 +46,10 @@ def index():
 
 def create_connections(project_id):
     print('calling bash script to create connections')
-    return_code = subprocess.call(['bash',"./connections.sh", project_id])
+    try:
+        return_code = subprocess.call(['bash',"./connections.sh", project_id])
+    except Exception as e:
+        print('Error creating connections: ', e)
     print ('return_code',return_code)
     return "create_connectons completed successfully"
 
@@ -150,9 +154,9 @@ def execute_dvt():
     print('reading CSV from GCS file')
     df = pd.read_csv('gs://dvt_configs/dvt_executions.csv')
     for index, row in df.iterrows():
-        print('current table: ' + row['target_table'])
 
         if row['validation_type'] == 'column':
+            print('current table: ' + row['target_table'])
             print('calling shell script for column validation')
 
             if pd.isna(row['count_columns']):
@@ -167,6 +171,7 @@ def execute_dvt():
                     print ("Error executing DVT validations")
 
         if row['validation_type'] == 'row_hash':
+            print('current table: ' + row['target_table'])
             partition_output = partition_assessment(row['target_table'])
             if partition_output['needs_partition'] == "N":
                 print('calling shell script for row validation')
@@ -179,6 +184,7 @@ def execute_dvt():
                     print ('return_code',return_code)
 
             else:
+                print('current table: ' + row['target_table'])
                 print('generating partition yamls')
 
                 table_name = row['target_table'].split('.')[2]
