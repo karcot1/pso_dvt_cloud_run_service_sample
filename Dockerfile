@@ -18,6 +18,7 @@ RUN pip install oauth2client
 RUN pip install Flask gunicorn
 RUN pip install --upgrade google-pso-data-validator
 RUN pip install gcsfs
+RUN pip install python-dotenv
 
 # Teradata Dependencies
 RUN pip install teradatasql

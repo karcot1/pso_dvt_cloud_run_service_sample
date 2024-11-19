@@ -8,7 +8,7 @@ from google.auth.transport import requests
 import google.auth
 import math
 import sys
-
+from dotenv import load_dotenv
 import gcsfs
 import pandas as pd
 import datetime
@@ -209,9 +209,9 @@ def execute_dvt():
                     print ('return_code',return_code)
             else:
                 print('generating partition yamls for custom query validation')
-                table_name = row['target_table'].split('.')[2]
+                custom_sql_name = row['source_sql_location'].split('/')[3]
                 datetime_var = '{date:%Y-%m-%d_%H:%M:%S}'.format(date=datetime.datetime.now())
-                gcs_location = 'gs://dvt_yamls/' + table_name + '/' + datetime_var
+                gcs_location = 'gs://dvt_yamls/' + custom_sql_name + '/' + datetime_var
 
                 if int(row['num_partitions']) <= 10000:
                     ppf = '1'
