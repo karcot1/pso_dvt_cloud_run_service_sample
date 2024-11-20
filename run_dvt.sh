@@ -19,7 +19,7 @@ fi
 	
 if [ $1  = "count" ]; then
     echo "executing column validation"
-    command="data-validation validate column --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --bq-result-handler $7"
+    command="data-validation validate column --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --bq-result-handler $6"
     echo $command
 	eval $command
 
