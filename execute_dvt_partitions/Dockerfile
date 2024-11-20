@@ -6,10 +6,10 @@ ENV PYTHONUNBUFFERED True
 # Copy local code to the container image.
 ENV APP_HOME /app
 WORKDIR $APP_HOME
-
-COPY connections.sh ./
-COPY app.py ./
-COPY run_dvt.sh ./
+COPY . ./
+COPY execute_dvt_partition_yamls.sh ./
+COPY main.py ./
+COPY partition_connections.sh ./
 
 # Install production dependencies.
 RUN apt-get update \
@@ -20,8 +20,6 @@ RUN pip install --upgrade google-auth
 RUN pip install oauth2client
 RUN pip install Flask gunicorn
 RUN pip install --upgrade google-pso-data-validator
-RUN pip install gcsfs
-RUN pip install python-dotenv
 
 # Teradata Dependencies
 RUN pip install teradatasql
