@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED True
 # Copy local code to the container image.
 ENV APP_HOME /app
 WORKDIR $APP_HOME
-COPY . ./
+
 COPY execute_dvt_partition_yamls.sh ./
 COPY main.py ./
 COPY partition_connections.sh ./
