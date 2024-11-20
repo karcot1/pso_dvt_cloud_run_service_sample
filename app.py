@@ -20,7 +20,7 @@ CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
 
 @app.route('/', methods=['POST'])
 
-def index():
+def dvt():
     project_id = os.environ.get("PROJECT_ID")
     print('project_id: ', project_id)
 
@@ -168,12 +168,12 @@ def execute_dvt():
             print('calling shell script for column validation')
 
             if pd.isna(row['count_columns']):
-                return_code = subprocess.call(['bash',"./run_dvt.sh", "count", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],"'*'",row['output_table']])                
+                return_code = subprocess.call(['bash',"./run_dvt.sh", "count", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['output_table']])                
                 print ('return_code',return_code)      
                 if return_code !=0:
                     print ("Error executing DVT validations")
             else:
-                return_code = subprocess.call(['bash',"./run_dvt.sh", "count", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['count_columns'],row['output_table']])                
+                return_code = subprocess.call(['bash',"./run_dvt.sh", "count", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['output_table']])                
                 print ('return_code',return_code)      
                 if return_code !=0:
                     print ("Error executing DVT validations")
@@ -248,4 +248,5 @@ def execute_dvt():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    dvt()
     
