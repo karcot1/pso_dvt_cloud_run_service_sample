@@ -141,6 +141,8 @@ def invoke_cloud_run(yaml_file_path,no_of_partitions, ppf):
         print ("before execution of command shell")
         result = subprocess.run(gcloud_command,shell=True,capture_output=True,text=True)  
         print ('override env variables: ', override_env_val)
+        print(result)
+        
         if result.returncode == 0:
             response=requests.post(cloud_run_url,headers=headers,data=override_env_val)   
 

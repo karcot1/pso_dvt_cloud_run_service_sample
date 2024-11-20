@@ -19,7 +19,7 @@ fi
 	
 if [ $1  = "count" ]; then
     echo "executing column validation"
-    command="data-validation validate column --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --count-columns $6 --bq-result-handler $7 --trim-string-pks"
+    command="data-validation validate column --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --count-columns $6 --bq-result-handler $7"
     echo $command
 	eval $command
 
@@ -36,9 +36,9 @@ elif [ $1 = "row" ]; then
 elif [ $1 = "partition" ]; then
     echo "generating partitioned yamls"
     if [ $7 = "Y" ]; then
-        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --primary-keys $6 --hash $8 --exclude-columns --bq-result-handler $9 --trim-string-pks --partition-num ${10} --ppf ${11} --config-dir ${12}"
+        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --primary-keys $6 --hash $8 --exclude-columns --bq-result-handler $9 --trim-string-pks --partition-num ${10} --parts-per-file ${11} --config-dir ${12}"
     else
-        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --primary-keys $6 --hash '*' --bq-result-handler $8 --trim-string-pks --partition-num $9 --ppf ${10} --config-dir ${11}"
+        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --tables-list $4=$5 --primary-keys $6 --hash '*' --bq-result-handler $8 --trim-string-pks --partition-num $9 --parts-per-file ${10} --config-dir ${11}"
     fi
     echo $command
     eval $command
@@ -56,9 +56,9 @@ elif [ $1 = "custom_no_partition" ]; then
 elif [ $1 = "custom_partition" ]; then
     echo "generating partition yamls for custom query validation"
     if [ $7 = "Y" ]; then
-        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash $6 --exclude-columns --source-query-file $7 --target-query-file $8 --bq-result-handler $9 --trim-string-pks --partition-num ${10} --ppf ${11} --config-dir ${12}"
+        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash $6 --exclude-columns --source-query-file $7 --target-query-file $8 --bq-result-handler $9 --trim-string-pks --partition-num ${10} --parts-per-file ${11} --config-dir ${12}"
     else
-        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash '*' --source-query-file $6 --target-query-file $7 --bq-result-handler $8 --trim-string-pks --partition-num $9 --ppf ${10} --config-dir ${11}"
+        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash '*' --source-query-file $6 --target-query-file $7 --bq-result-handler $8 --trim-string-pks --partition-num $9 --parts-per-file ${10} --config-dir ${11}"
     fi
     echo $command
     eval $command    

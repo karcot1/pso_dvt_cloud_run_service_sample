@@ -4,7 +4,7 @@ FROM python:3.9-slim
 ENV PYTHONUNBUFFERED True
 
 # Copy local code to the container image.
-ENV APP_HOME /app
+ENV APP_HOME /appgi
 WORKDIR $APP_HOME
 
 COPY execute_dvt_partition_yamls.sh ./
