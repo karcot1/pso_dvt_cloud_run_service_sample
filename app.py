@@ -108,45 +108,51 @@ def partition_assessment(bq_table):
     
 
 
-def invoke_cloud_run(yaml_file_path,cloud_run_url,no_of_partitions, ppf):
+def invoke_cloud_run(yaml_file_path,no_of_partitions, ppf):
     AUTH_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
     credentials, _ = google.auth.default(scopes=[AUTH_SCOPE])
     credentials.refresh(requests.Request())
     project_id = os.environ.get("PROJECT_ID")
+    cloud_run_job_name = os.environ.get("CLOUD_RUN_JOB_NAME")
    
     oauth_token=credentials.token
+
     authorization = f"Bearer {oauth_token}"
+    
     headers = {
     "accept": "application/json",
     "Authorization": authorization
     }
-    #override_env_val = f'{{"overrides": {{"containerOverrides": [{{"env": [{{"name": "PROJECT_ID", "value": "{project_id}"}},{{"name": "CONFIG_YAML_PATH", "value": "{yaml_file_path}"}},{{"name": "SOURCE_DB", "value": "{source_DB}"}}]}}],"task_count":{no_of_partitions} }}}}'
+
     override_env_val = f'{{"overrides": {{"containerOverrides": [{{"env": [{{"name": "PROJECT_ID", "value": "{project_id}"}},{{"name": "CONFIG_YAML_PATH", "value": "{yaml_file_path}"}}]}}] }}}}'
     
     parallelism = no_of_partitions if int(no_of_partitions) < 50 else 49
     tasks =    no_of_partitions if int(no_of_partitions) < 10000 else math.ceil(int(no_of_partitions)/ppf )  
-    extract_cloud_run_job_name = cloud_run_url.split("/jobs/")
-    extract_cloud_run_job_name=extract_cloud_run_job_name[1].split(":")
-    print (extract_cloud_run_job_name[0])
-    gcloud_command =f"gcloud run jobs update {extract_cloud_run_job_name[0]} --region us-central1 --parallelism {parallelism} --tasks {tasks}"
-    print (gcloud_command)
+    # extract_cloud_run_job_name = cloud_run_url.split("/jobs/")
+    # extract_cloud_run_job_name=extract_cloud_run_job_name[1].split(":")
+    # print (extract_cloud_run_job_name[0])
+
+    gcloud_command =f"gcloud run jobs update {cloud_run_job_name} --region us-central1 --parallelism {parallelism} --tasks {tasks}"
+    print ('update job command: ', gcloud_command)
+
+    cloud_run_url = f'https://run.googleapis.com/v2/projects/{project_id}/locations/us-central1/jobs/{cloud_run_job_name}:run'
     
-    # try:
-    #     print ("before execution of command shell")
-    #     result = subprocess.run(gcloud_command,shell=True,capture_output=True,text=True)  
-    #     print (override_env_val)
-    #     if result.returncode == 0:
-    #         response=requests.post(cloud_run_url,headers=headers,data=override_env_val)   
+    try:
+        print ("before execution of command shell")
+        result = subprocess.run(gcloud_command,shell=True,capture_output=True,text=True)  
+        print ('override env variables: ', override_env_val)
+        if result.returncode == 0:
+            response=requests.post(cloud_run_url,headers=headers,data=override_env_val)   
 
-    #         if response.status_code == 200:
-    #             print ("DVT with config complete")
-    #         else:
-    #             print ("Request Failed with status code",response.status_code)  
-    #     else:
-    #         print ("failed to update parallelism")
+            if response.status_code == 200:
+                print ("DVT with config complete")
+            else:
+                print ("Request Failed with status code",response.status_code)  
+        else:
+            print ("failed to update parallelism")
 
-    # except subprocess.CalledProcessError as e:
-    #     print(f"Error updating Cloud Run job: {e.stderr}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error updating Cloud Run job: {e.stderr}")
 
 def execute_dvt():
     print('Executing DVT')
@@ -228,9 +234,14 @@ def execute_dvt():
                 if row['exclude_columns'] == 'Y':
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"Y",row['exclude_column_list'],row['source_sql_location'],row['target_sql_location'],row['output_table'],str(int(row['num_partitions'])),ppf,gcs_location])
                     print ('return_code',return_code)
+
+                    invoke_cloud_run(gcs_location,row['num_partitions'],ppf)
                 else:
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"N",row['source_sql_location'],row['target_sql_location'],row['output_table'],str(int(row['num_partitions'])),ppf,gcs_location])
                     print ('return_code',return_code)
+
+                    invoke_cloud_run(gcs_location,row['num_partitions'],ppf)
+
     return "DVT executions completed"
 
 if __name__ == "__main__":
