@@ -167,16 +167,10 @@ def execute_dvt():
             print('current table: ' + row['target_table'])
             print('calling shell script for column validation')
 
-            if pd.isna(row['count_columns']):
-                return_code = subprocess.call(['bash',"./run_dvt.sh", "count", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['output_table']])                
-                print ('return_code',return_code)      
-                if return_code !=0:
-                    print ("Error executing DVT validations")
-            else:
-                return_code = subprocess.call(['bash',"./run_dvt.sh", "count", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['output_table']])                
-                print ('return_code',return_code)      
-                if return_code !=0:
-                    print ("Error executing DVT validations")
+            return_code = subprocess.call(['bash',"./run_dvt.sh", "count", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['output_table']])                
+            print ('return_code',return_code)      
+            if return_code !=0:
+                print ("Error executing DVT validations")
 
         if row['validation_type'] == 'row_hash':
             print('current table: ' + row['target_table'])
