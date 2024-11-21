@@ -7,9 +7,9 @@ ENV PYTHONUNBUFFERED True
 ENV APP_HOME /appgi
 WORKDIR $APP_HOME
 
-COPY execute_dvt_partition_yamls.sh ./
-COPY main.py ./
-COPY partition_connections.sh ./
+COPY execute_dvt_partitions/execute_dvt_partition_yamls.sh
+COPY execute_dvt_partitions/main.py
+COPY execute_dvt_partitions/partition_connections.sh
 
 # Install production dependencies.
 RUN apt-get update \
