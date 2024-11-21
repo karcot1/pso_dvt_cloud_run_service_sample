@@ -7,9 +7,9 @@ ENV PYTHONUNBUFFERED True
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
-COPY connections.sh ./
-COPY dvt_main.py ./
-COPY run_dvt.sh ./
+COPY execute_dvt/connections.sh ./
+COPY execute_dvt/dvt_main.py ./
+COPY execute_dvt/run_dvt.sh ./
 
 # Install production dependencies.
 RUN apt-get update \
