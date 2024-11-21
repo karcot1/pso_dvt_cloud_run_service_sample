@@ -14,12 +14,13 @@ import gcsfs
 import pandas as pd
 import datetime
 
-app = Flask(__name__)
 
 AUTH_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
 CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
 
-@app.route('/', methods=['POST'])
+#UNCOMMENT TO RUN AS SERVICE:
+# app = Flask(__name__)
+# @app.route('/', methods=['POST'])
 
 def dvt():
     project_id = os.environ.get("PROJECT_ID")
@@ -134,9 +135,6 @@ def invoke_cloud_run(yaml_file_path,no_of_partitions, ppf):
 
     parallelism = no_of_partitions if int(no_of_partitions) < 50 else 49
     tasks =    no_of_partitions if int(no_of_partitions) < 10000 else math.ceil(int(no_of_partitions)/ppf )  
-    # extract_cloud_run_job_name = cloud_run_url.split("/jobs/")
-    # extract_cloud_run_job_name=extract_cloud_run_job_name[1].split(":")
-    # print (extract_cloud_run_job_name[0])
 
     gcloud_command =f"gcloud run jobs update {cloud_run_job_name} --region us-central1 --parallelism {parallelism} --tasks {tasks}"
     print ('update job command: ', gcloud_command)
@@ -264,6 +262,9 @@ def execute_dvt():
     return "DVT executions completed"
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
-    # dvt()
+    # UNCOMMENT TO RUN AS SERVICE:
+    # app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    
+    #UNCOMMENT TO RUN AS JOB:
+    dvt()
     

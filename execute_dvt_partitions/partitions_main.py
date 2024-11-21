@@ -6,15 +6,13 @@ from google.cloud import storage
 from google.cloud import bigquery
 import google.auth
 
-app = Flask(__name__)
-
 AUTH_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
 CREDENTIALS, _ = google.auth.default(scopes=[AUTH_SCOPE])
 
-@app.route('/', methods=['POST'])
+# UNCOMMENT TO RUN AS SERVICE:
+# app = Flask(__name__)
+# @app.route('/', methods=['POST'])
 
-# def main():
-#     print('placeholder for DVT partition execution')
 
 def main():
 
@@ -54,7 +52,10 @@ def main():
 # #         os.environ[key] = value
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
-    # main()
+    # UNCOMMENT TO RUN AS SERVICE:
+    # app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    
+    #UNCOMMENT TO RUN AS JOB:
+    main()
 
     

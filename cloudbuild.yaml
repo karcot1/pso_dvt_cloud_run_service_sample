@@ -1,0 +1,17 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/dvt-in-cloud-run/dvt-cloud-run-execute', '.', '-f', 'execute_dvt/Dockerfile']
+    id: build-dvt-execute
+  - name: gcr.io/cloud-builders/docker
+    args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/dvt-in-cloud-run/dvt-cloud-run-execute']
+    id: push-dvt-execute
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/dvt-in-cloud-run/dvt-cloud-run-partition-execute', '.', '-f', 'execute_dvt_partitions/Dockerfile']
+    id: build-dvt-partition
+  - name: gcr.io/cloud-builders/docker
+    args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/dvt-in-cloud-run/dvt-cloud-run-partition-execute']
+    id: push-dvt-partition
+options:
+  logging: CLOUD_LOGGING_ONLY
+tags:
+  - dvt-cloud-run
