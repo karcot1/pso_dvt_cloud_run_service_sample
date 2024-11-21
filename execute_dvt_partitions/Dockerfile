@@ -7,9 +7,9 @@ ENV PYTHONUNBUFFERED True
 ENV APP_HOME /appgi
 WORKDIR $APP_HOME
 
-COPY execute_dvt_partitions/execute_dvt_partition_yamls.sh ./
-COPY execute_dvt_partitions/main.py ./ 
-COPY execute_dvt_partitions/partition_connections.sh ./
+COPY execute_dvt_partition_yamls.sh ./
+COPY main.py ./ 
+COPY partition_connections.sh ./
 
 # Install production dependencies.
 RUN apt-get update \
@@ -60,4 +60,4 @@ RUN pip install teradatasql
 # For environments with multiple CPU cores, increase the number of workers
 # to be equal to the cores available.
 # Timeout is set to 0 to disable the timeouts of the workers to allow Cloud Run to handle instance scaling.
-CMD ["python", "main.py"]
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 partitions_main:app

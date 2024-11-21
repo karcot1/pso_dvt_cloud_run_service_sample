@@ -8,7 +8,7 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 
 COPY execute_dvt/connections.sh ./
-COPY execute_dvt/main.py ./
+COPY execute_dvt/app.py ./
 COPY execute_dvt/run_dvt.sh ./
 
 # Install production dependencies.
@@ -62,4 +62,4 @@ RUN pip install teradatasql
 # For environments with multiple CPU cores, increase the number of workers
 # to be equal to the cores available.
 # Timeout is set to 0 to disable the timeouts of the workers to allow Cloud Run to handle instance scaling.
-CMD ["python", "app.py"]
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 dvt_main:app
