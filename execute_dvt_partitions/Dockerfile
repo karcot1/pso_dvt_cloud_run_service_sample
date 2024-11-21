@@ -8,7 +8,7 @@ ENV APP_HOME /appgi
 WORKDIR $APP_HOME
 
 COPY execute_dvt_partition_yamls.sh ./
-COPY main.py ./ 
+COPY partitions_main.py ./ 
 COPY partition_connections.sh ./
 
 # Install production dependencies.
