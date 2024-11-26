@@ -45,7 +45,7 @@ elif [ $1 = "partition" ]; then
 
 elif [ $1 = "custom_no_partition" ]; then
     echo "executing custom query validation"
-    if [ $7 = "Y" ]; then
+    if [ $5 = "Y" ]; then
         command="data-validation validate custom-query row --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash $6 --exclude-columns --source-query-file $7 --target-query-file $8 --bq-result-handler $9 --trim-string-pks"
     else 
         command="data-validation validate custom-query row --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash '*' --source-query-file $6 --target-query-file $7 --bq-result-handler $8 --trim-string-pks"
@@ -55,8 +55,8 @@ elif [ $1 = "custom_no_partition" ]; then
 
 elif [ $1 = "custom_partition" ]; then
     echo "generating partition yamls for custom query validation"
-    if [ $7 = "Y" ]; then
-        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash $6 --exclude-columns --source-query-file $7 --target-query-file $8 --bq-result-handler $9 --trim-string-pks --partition-num ${10} --parts-per-file ${11} --config-dir ${12}"
+    if [ $5 = "Y" ]; then
+        command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --primary-key $4 --source-query-file $6 --target-query-file $7 --hash $8 --exclude-columns --bq-result-handler $9 --trim-string-pks --partition-num ${10} --parts-per-file ${11} --config-dir ${12}"
     else
         command="data-validation generate-table-partitions --source-conn $source_conn --target-conn $target_conn --primary-key $4 --hash '*' --source-query-file $6 --target-query-file $7 --bq-result-handler $8 --trim-string-pks --partition-num $9 --parts-per-file ${10} --config-dir ${11}"
     fi
