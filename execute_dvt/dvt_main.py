@@ -65,7 +65,7 @@ def create_connections(project_id):
 #     for key,value in tera_json.items():
 #         os.environ[key] = value
 
-def partition_assessment(validation_type,bq_table, **kwargs):
+def partition_assessment(validation_type,**kwargs):
 
     # calculate partitions and parts per file needed based on table size for row hash validation
     # does not currently support custom query partitions - will need to specify partitioning features manually in CSV
@@ -75,6 +75,7 @@ def partition_assessment(validation_type,bq_table, **kwargs):
     client = bigquery.Client()
 
     if validation_type == "row hash":
+        bq_table = kwargs.get('bq_table')
         query = f"""SELECT COUNT(*) FROM {bq_table}"""
     if validation_type == "custom query":
 
@@ -190,7 +191,7 @@ def execute_dvt():
 
         if row['validation_type'] == 'row_hash':
             print('current table: ' + row['target_table'])
-            partition_output = partition_assessment("row hash", row['target_table'])
+            partition_output = partition_assessment("row hash", bq_table=row['target_table'])
             if partition_output['needs_partition'] == "N":
                 print('calling shell script for row validation')
 
