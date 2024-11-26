@@ -65,7 +65,7 @@ def create_connections(project_id):
 #     for key,value in tera_json.items():
 #         os.environ[key] = value
 
-def partition_assessment(bq_table):
+def partition_assessment(validation_type,bq_table, **kwargs):
 
     # calculate partitions and parts per file needed based on table size for row hash validation
     # does not currently support custom query partitions - will need to specify partitioning features manually in CSV
@@ -73,7 +73,19 @@ def partition_assessment(bq_table):
     print('obtaining size of table')
 
     client = bigquery.Client()
-    query = f"""SELECT COUNT(*) FROM {bq_table}"""
+
+    if validation_type == "row hash":
+        query = f"""SELECT COUNT(*) FROM {bq_table}"""
+    if validation_type == "custom query":
+
+        bucket_name = kwargs.get('bucket')
+        file_location = kwargs.get('file')
+        client = storage.Client()
+        bucket = client.get_bucket(bucket_name)
+        blob = bucket.get_blob(file_location)
+        subquery = blob.download_as_string()
+
+        query = f"""SELECT COUNT(*) FROM ({subquery})"""
 
     partition_output = {}
 
@@ -147,12 +159,13 @@ def invoke_cloud_run(yaml_file_path,no_of_partitions, ppf):
         print(result)
         
         if result.returncode == 0:
-            response=requests.post(cloud_run_url,headers=headers,data=override_env_val)   
+            print('exeuting partition cloud run job')
+            # response=requests.post(cloud_run_url,headers=headers,data=override_env_val)   
 
-            if response.status_code == 200:
-                print ("DVT with config complete")
-            else:
-                print ("Request Failed with status code",response.status_code)  
+            # if response.status_code == 200:
+            #     print ("DVT with config complete")
+            # else:
+            #     print ("Request Failed with status code",response.status_code)  
         else:
             print ("failed to update parallelism")
 
@@ -177,7 +190,7 @@ def execute_dvt():
 
         if row['validation_type'] == 'row_hash':
             print('current table: ' + row['target_table'])
-            partition_output = partition_assessment(row['target_table'])
+            partition_output = partition_assessment("row hash", row['target_table'])
             if partition_output['needs_partition'] == "N":
                 print('calling shell script for row validation')
 
@@ -220,7 +233,17 @@ def execute_dvt():
         if row['validation_type'] == 'custom_query':
             print('executing custom sql validation')
 
-            if row['partition'] == "N":
+            full_gcs_path = row['target_sql_location']
+            gcs_path_split = full_gcs_path.split('/')
+
+            bucket_name = gcs_path_split[2]
+            separator = '/'
+            file_location = separator.join(gcs_path_split[3:])
+
+            partition_output = partition_assessment("custom query", bucket=bucket_name, file=file_location)
+
+            # if row['partition'] == "N":
+            if partition_output['needs_partition'] == "N":
                 print('calling shell script for custom query validation')
                 if row['exclude_columns'] == 'Y':
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_no_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"Y",row['exclude_column_list'],row['source_sql_location'],row['target_sql_location'],row['output_table']])
@@ -235,29 +258,29 @@ def execute_dvt():
                 local_directory = 'partitions/' + custom_sql_name + '/' + datetime_var
                 gcs_location = 'gs://dvt_yamls/' + custom_sql_name + '/' + datetime_var
 
-                if int(row['num_partitions']) <= 10000:
-                    ppf = '1'
-                else:
-                    ppf = math.ceil(int(row['num_partitions']) / 10000)
+                # if int(row['num_partitions']) <= 10000:
+                #     ppf = '1'
+                # else:
+                #     ppf = math.ceil(int(row['num_partitions']) / 10000)
 
                 if row['exclude_columns'] == 'Y':
-                    return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"Y",row['source_sql_location'],row['target_sql_location'],row['exclude_column_list'],row['output_table'],math.ceil(int(row['num_partitions'])),ppf,local_directory])
+                    return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"Y",row['source_sql_location'],row['target_sql_location'],row['exclude_column_list'],row['output_table'],str(partition_output['num_partitions']),str(partition_output['parts_per_file']),local_directory])
                     print ('return_code',return_code)
                     print('copying partition files to GCS')
                     gcloud_command = f'gsutil -m cp -R {local_directory} {gcs_location}'
                     result = subprocess.run(gcloud_command,shell=True,capture_output=True,text=True)
                     print(result)
 
-                    invoke_cloud_run(gcs_location,row['num_partitions'],ppf)
+                    invoke_cloud_run(gcs_location,partition_output['num_partitions'],partition_output['parts_per_file'])
                 else:
-                    return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"N",row['source_sql_location'],row['target_sql_location'],row['output_table'],math.ceil(int(row['num_partitions'])),ppf,local_directory])
+                    return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"N",row['source_sql_location'],row['target_sql_location'],row['output_table'],str(partition_output['num_partitions']),str(partition_output['parts_per_file']),local_directory])
                     print ('return_code',return_code)
                     print('copying partition files to GCS')
                     gcloud_command = f'gsutil -m cp -R {local_directory} {gcs_location}'
                     result = subprocess.run(gcloud_command,shell=True,capture_output=True,text=True)
                     print(result)
 
-                    invoke_cloud_run(gcs_location,row['num_partitions'],ppf)
+                    invoke_cloud_run(gcs_location,partition_output['num_partitions'],partition_output['parts_per_file'])
 
     return "DVT executions completed"
 
