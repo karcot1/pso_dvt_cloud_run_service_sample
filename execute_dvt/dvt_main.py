@@ -72,7 +72,7 @@ def partition_assessment(validation_type,**kwargs):
 
     print('obtaining size of table')
 
-    client = bigquery.Client()
+    bq_client = bigquery.Client()
 
     if validation_type == "row hash":
         bq_table = kwargs.get('bq_table')
@@ -81,8 +81,8 @@ def partition_assessment(validation_type,**kwargs):
 
         bucket_name = kwargs.get('bucket')
         file_location = kwargs.get('file')
-        client = storage.Client()
-        bucket = client.get_bucket(bucket_name)
+        gcs_client = storage.Client()
+        bucket = gcs_client.get_bucket(bucket_name)
         blob = bucket.get_blob(file_location)
         subquery = blob.download_as_string()
 
@@ -91,7 +91,7 @@ def partition_assessment(validation_type,**kwargs):
     partition_output = {}
 
     try:
-        results = client.query(query).result()
+        results = bq_client.query(query).result()
         row_count = next(results)[0]
         print('table size: ' , str(row_count))
     except Exception as e:
