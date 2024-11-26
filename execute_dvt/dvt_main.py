@@ -84,7 +84,7 @@ def partition_assessment(validation_type,**kwargs):
         gcs_client = storage.Client()
         bucket = gcs_client.get_bucket(bucket_name)
         blob = bucket.get_blob(file_location)
-        subquery = blob.download_as_string()
+        subquery = str(blob.download_as_text())
 
         query = f"""SELECT COUNT(*) FROM ({subquery})"""
 
