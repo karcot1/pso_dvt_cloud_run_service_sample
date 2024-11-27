@@ -267,7 +267,7 @@ def execute_dvt():
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"Y",row['source_sql_location'],row['target_sql_location'],row['exclude_column_list'],row['output_table'],str(partition_output['num_partitions']),str(partition_output['parts_per_file']),local_directory])
                     print ('return_code',return_code)
                     print('copying partition files to GCS')
-                    gcloud_command = f'gsutil -m cp -R {local_directory} {gcs_location}'
+                    gcloud_command = f'gsutil -m cp -R {local_files} {gcs_location}'
                     result = subprocess.run(gcloud_command,shell=True,capture_output=True,text=True)
                     print(result)
 
@@ -276,7 +276,7 @@ def execute_dvt():
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"N",row['source_sql_location'],row['target_sql_location'],row['output_table'],str(partition_output['num_partitions']),str(partition_output['parts_per_file']),local_directory])
                     print ('return_code',return_code)
                     print('copying partition files to GCS')
-                    gcloud_command = f'gsutil -m cp -R {local_directory} {gcs_location}'
+                    gcloud_command = f'gsutil -m cp -R {local_files} {gcs_location}'
                     result = subprocess.run(gcloud_command,shell=True,capture_output=True,text=True)
                     print(result)
 

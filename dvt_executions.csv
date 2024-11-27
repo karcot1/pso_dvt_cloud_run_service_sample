@@ -1,10 +1,3 @@
 validation_type,source_conn,target_conn,source_table,target_table,primary_keys,exclude_columns,exclude_column_list,source_sql_location,target_sql_location,partition,num_partitions,output_table
-column,bigquery,bigquery,dataform-test-362521.dvt_source.test_columns,dataform-test-362521.dvt_target.test_columns,,,,,,,,dataform-test-362521.dvt_output.validation_results
-row_hash,bigquery,bigquery,dataform-test-362521.dvt_source.test_row_no_partition,dataform-test-362521.dvt_target.test_row_no_partition,"id",N,,,,,,dataform-test-362521.dvt_output.validation_results
-row_hash,bigquery,bigquery,dataform-test-362521.dvt_source.test_row_no_partition,dataform-test-362521.dvt_target.test_row_no_partition,"id",Y,"'col2'",,,,,dataform-test-362521.dvt_output.validation_results
-row_hash,bigquery,bigquery,dataform-test-362521.dvt_source.test_row_w_partition,dataform-test-362521.dvt_target.test_row_w_partition,"id",N,,,,,,dataform-test-362521.dvt_output.validation_results
-row_hash,bigquery,bigquery,dataform-test-362521.dvt_source.test_row_w_partition,dataform-test-362521.dvt_target.test_row_w_partition,"id",Y,"'creation_date','link_type_id'",,,,,dataform-test-362521.dvt_output.validation_results
-custom_query,bigquery,bigquery,,,"id",N,,gs://dvt_custom_sql/test_custom_no_partition/src.sql,gs://dvt_custom_sql/test_custom_no_partition/trgt.sql,N,,dataform-test-362521.dvt_output.validation_results
-custom_query,bigquery,bigquery,,,"id",Y,"'col2'",gs://dvt_custom_sql/test_custom_no_partition/src.sql,gs://dvt_custom_sql/test_custom_no_partition/trgt.sql,N,,dataform-test-362521.dvt_output.validation_results
 custom_query,bigquery,bigquery,,,"id",N,,gs://dvt_custom_sql/test_custom_w_partition/src.sql,gs://dvt_custom_sql/test_custom_w_partition/trgt.sql,Y,200,dataform-test-362521.dvt_output.validation_results
 custom_query,bigquery,bigquery,,,"id",Y,"'creation_date','post_id'",gs://dvt_custom_sql/test_custom_w_partition/src.sql,gs://dvt_custom_sql/test_custom_w_partition/trgt.sql,Y,200,dataform-test-362521.dvt_output.validation_results
