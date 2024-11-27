@@ -68,19 +68,21 @@ def create_connections(project_id):
 def partition_assessment(validation_type,**kwargs):
 
     # calculate partitions and parts per file needed based on table size for row hash validation
-    # does not currently support custom query partitions - will need to specify partitioning features manually in CSV
-
     print('obtaining size of table')
 
     bq_client = bigquery.Client()
 
     if validation_type == "row hash no filter":
         bq_table = kwargs.get('bq_table')
-        query = f"""SELECT COUNT(*) FROM {bq_table}"""
+        check_query = f"""SELECT COUNT(*) FROM {bq_table}"""
+        print(check_query)
+
     if validation_type == "row hash with filter":
         bq_table = kwargs.get('bq_table')
         filters = kwargs.get('filters')
-        query = f"""SELECT COUNT(*) FROM {bq_table} WHERE {filters}"""
+        check_query = f"""SELECT COUNT(*) FROM {bq_table} WHERE {filters}"""
+        print(check_query)
+
     if validation_type == "custom query no filters":
 
         bucket_name = kwargs.get('bucket')
@@ -90,7 +92,9 @@ def partition_assessment(validation_type,**kwargs):
         blob = bucket.get_blob(file_location)
         subquery = str(blob.download_as_text()).replace(';','')
 
-        query = f"""SELECT COUNT(*) FROM ({subquery})"""
+        check_query = f"""SELECT COUNT(*) FROM ({subquery})"""
+        print(check_query)
+
     if validation_type == "custom query with filters":
         
         bucket_name = kwargs.get('bucket')
@@ -101,12 +105,13 @@ def partition_assessment(validation_type,**kwargs):
         blob = bucket.get_blob(file_location)
         subquery = str(blob.download_as_text()).replace(';','')
 
-        query = f"""SELECT COUNT(*) FROM ({subquery} WHERE {filters})"""
+        check_query = f"""SELECT COUNT(*) FROM ({subquery} WHERE {filters})"""
+        print(check_query)
 
     partition_output = {}
 
     try:
-        results = bq_client.query(query).result()
+        results = bq_client.query(check_query).result()
         row_count = next(results)[0]
         print('table size: ' , str(row_count))
     except Exception as e:
