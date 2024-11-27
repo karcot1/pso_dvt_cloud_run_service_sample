@@ -74,10 +74,14 @@ def partition_assessment(validation_type,**kwargs):
 
     bq_client = bigquery.Client()
 
-    if validation_type == "row hash":
+    if validation_type == "row hash no filter":
         bq_table = kwargs.get('bq_table')
         query = f"""SELECT COUNT(*) FROM {bq_table}"""
-    if validation_type == "custom query":
+    if validation_type == "row hash with filter":
+        bq_table = kwargs.get('bq_table')
+        filters = kwargs.get('filters')
+        query = f"""SELECT COUNT(*) FROM {bq_table} WHERE {filters}"""
+    if validation_type == "custom query no filters":
 
         bucket_name = kwargs.get('bucket')
         file_location = kwargs.get('file')
@@ -87,6 +91,17 @@ def partition_assessment(validation_type,**kwargs):
         subquery = str(blob.download_as_text()).replace(';','')
 
         query = f"""SELECT COUNT(*) FROM ({subquery})"""
+    if validation_type == "custom query with filters":
+        
+        bucket_name = kwargs.get('bucket')
+        file_location = kwargs.get('file')
+        filters = kwargs.get('filters')
+        gcs_client = storage.Client()
+        bucket = gcs_client.get_bucket(bucket_name)
+        blob = bucket.get_blob(file_location)
+        subquery = str(blob.download_as_text()).replace(';','')
+
+        query = f"""SELECT COUNT(*) FROM ({subquery} WHERE {filters})"""
 
     partition_output = {}
 
@@ -191,7 +206,12 @@ def execute_dvt():
 
         if row['validation_type'] == 'row_hash':
             print('current table: ' + row['target_table'])
-            partition_output = partition_assessment("row hash", bq_table=row['target_table'])
+
+            if row['filters'].isna():
+                partition_output = partition_assessment("row hash no filter", bq_table=row['target_table'])
+            else:
+                partition_output = partition_assessment("row has with filter", bq_table=row['target_table'], filters=row['filters'])
+
             if partition_output['needs_partition'] == "N":
                 print('calling shell script for row validation')
 
@@ -242,7 +262,10 @@ def execute_dvt():
             separator = '/'
             file_location = separator.join(gcs_path_split[3:])
 
-            partition_output = partition_assessment("custom query", bucket=bucket_name, file=file_location)
+            if row['filters'].isna():
+                partition_output = partition_assessment("custom query", bucket=bucket_name, file=file_location)
+            else:
+                partition_output = partition_assessment("custom query", bucket=bucket_name, file=file_location, filters=row['filters'])
 
             if partition_output['needs_partition'] == "N":
                 print('calling shell script for custom query validation')
