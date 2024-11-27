@@ -12,6 +12,6 @@ echo $config_file_dir
 command="data-validation configs run -kc -cdir $1"
 
 echo $command
-# eval $command
+eval $command
 
 echo "script run complete"
