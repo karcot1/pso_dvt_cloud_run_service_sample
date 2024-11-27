@@ -72,12 +72,12 @@ def partition_assessment(validation_type,**kwargs):
 
     bq_client = bigquery.Client()
 
-    if validation_type == "row hash no filter":
+    if validation_type == "row hash no filters":
         bq_table = kwargs.get('bq_table')
         check_query = f"""SELECT COUNT(*) FROM {bq_table}"""
         print(check_query)
 
-    if validation_type == "row hash with filter":
+    if validation_type == "row hash with filters":
         bq_table = kwargs.get('bq_table')
         filters = kwargs.get('filters')
         check_query = f"""SELECT COUNT(*) FROM {bq_table} WHERE {filters}"""
@@ -213,9 +213,9 @@ def execute_dvt():
             print('current table: ' + row['target_table'])
 
             if pd.isna(row['filters']):
-                partition_output = partition_assessment("row hash no filter", bq_table=row['target_table'])
+                partition_output = partition_assessment("row hash no filters", bq_table=row['target_table'])
             else:
-                partition_output = partition_assessment("row has with filter", bq_table=row['target_table'], filters=row['filters'])
+                partition_output = partition_assessment("row has with filters", bq_table=row['target_table'], filters=row['filters'])
 
             if partition_output['needs_partition'] == "N":
                 print('calling shell script for row validation')
@@ -268,9 +268,9 @@ def execute_dvt():
             file_location = separator.join(gcs_path_split[3:])
 
             if pd.isna(row['filters']):
-                partition_output = partition_assessment("custom query", bucket=bucket_name, file=file_location)
+                partition_output = partition_assessment("custom query no filters", bucket=bucket_name, file=file_location)
             else:
-                partition_output = partition_assessment("custom query", bucket=bucket_name, file=file_location, filters=row['filters'])
+                partition_output = partition_assessment("custom query with filters", bucket=bucket_name, file=file_location, filters=row['filters'])
 
             if partition_output['needs_partition'] == "N":
                 print('calling shell script for custom query validation')
