@@ -207,7 +207,7 @@ def execute_dvt():
         if row['validation_type'] == 'row_hash':
             print('current table: ' + row['target_table'])
 
-            if row['filters'].isna():
+            if pd.isna(row['filters']):
                 partition_output = partition_assessment("row hash no filter", bq_table=row['target_table'])
             else:
                 partition_output = partition_assessment("row has with filter", bq_table=row['target_table'], filters=row['filters'])
@@ -262,7 +262,7 @@ def execute_dvt():
             separator = '/'
             file_location = separator.join(gcs_path_split[3:])
 
-            if row['filters'].isna():
+            if pd.isna(row['filters']):
                 partition_output = partition_assessment("custom query", bucket=bucket_name, file=file_location)
             else:
                 partition_output = partition_assessment("custom query", bucket=bucket_name, file=file_location, filters=row['filters'])
