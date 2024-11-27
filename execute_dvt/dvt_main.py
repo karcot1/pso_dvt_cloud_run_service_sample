@@ -161,12 +161,12 @@ def invoke_cloud_run(yaml_file_path,no_of_partitions, ppf):
         
         if result.returncode == 0:
             print('exeuting partition cloud run job')
-            # response=requests.post(cloud_run_url,headers=headers,data=override_env_val)   
+            response=requests.post(cloud_run_url,headers=headers,data=override_env_val)   
 
-            # if response.status_code == 200:
-            #     print ("DVT with config complete")
-            # else:
-            #     print ("Request Failed with status code",response.status_code)  
+            if response.status_code == 200:
+                print ("DVT with config complete")
+            else:
+                print ("Request Failed with status code",response.status_code)  
         else:
             print ("failed to update parallelism")
 
