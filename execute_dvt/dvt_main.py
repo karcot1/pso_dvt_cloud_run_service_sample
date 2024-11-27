@@ -210,7 +210,7 @@ def execute_dvt():
                 datetime_var = '{date:%Y-%m-%d_%H:%M:%S}'.format(date=datetime.datetime.now())
                 local_directory = 'partitions/' + table_name + '/' + datetime_var
                 gcs_location = 'gs://dvt_yamls/' + table_name + '/' + datetime_var
-                yaml_full_path = gcs_location + '/' + row['target_table']
+                yaml_full_path = gcs_location + '/' + row['target_table'] + '/'
 
                 if row['exclude_columns'] == 'Y':
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "partition", row['source_conn'],row['target_conn'],row['source_table'],row['target_table'],row['primary_keys'],"Y",row['exclude_column_list'],row['output_table'],str(partition_output['num_partitions']),str(partition_output['parts_per_file']),local_directory])
@@ -259,7 +259,7 @@ def execute_dvt():
                 datetime_var = '{date:%Y-%m-%d_%H:%M:%S}'.format(date=datetime.datetime.now())
                 local_directory = 'partitions/' + custom_sql_name + '/' + datetime_var
                 gcs_location = 'gs://dvt_yamls/' + custom_sql_name + '/' + datetime_var
-                yaml_full_path = gcs_location + '/' + row['target_table']
+                yaml_full_path = gcs_location + '/' + row['target_table'] + '/'
 
                 if row['exclude_columns'] == 'Y':
                     return_code = subprocess.call(['bash',"./run_dvt.sh", "custom_partition", row['source_conn'],row['target_conn'],row['primary_keys'],"Y",row['source_sql_location'],row['target_sql_location'],row['exclude_column_list'],row['output_table'],str(partition_output['num_partitions']),str(partition_output['parts_per_file']),local_directory])
