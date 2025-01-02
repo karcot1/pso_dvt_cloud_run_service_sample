@@ -19,12 +19,12 @@ eval $bqcommand
 # eval $tdcommand
 
 echo "Testing FileSystem src connection"
-fscommand="data-validation connections add --connection-name FILE_conn1 FileSystem --table-name file1_table --file-path gs://dvt_filesystem_conn_test1/test_src.csv --file-type csv"
+fscommand="data-validation connections add --connection-name FILE_conn1 FileSystem --table-name file1_table --file-path  gs://dvt_filesystem_conn_test1/test_src.csv --file-type csv"
 echo $fscommand
 eval $fscommand
 
 echo "Testing FileSystem tgt connection"
-fscommand="data-validation connections add --connection-name FILE_conn2 FileSystem --table-name file2_table --file-path gs://dvt_filesystem_conn_test1/test_tgt.csv --file-type csv"
+fscommand="data-validation connections add --connection-name FILE_conn2 FileSystem --table-name file2_table --file-path  gs://dvt_filesystem_conn_test1/test_tgt.csv --file-type csv"
 echo $fscommand
 eval $fscommand
 
